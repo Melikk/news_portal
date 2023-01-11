@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="createFoundationalTables" author="Aram Meliksetyan">
+
+        <createTable tableName="roles">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints unique="true"
+                             nullable="false"/>
+            </column>
+        </createTable>
+
+        <sql>
+            INSERT INTO roles (name)
+            VALUES ('USER'),
+                   ('STAFF'),
+                   ('ADMIN');
+        </sql>
+
+        <createTable tableName="users">
+            <column name="id" type="bigserial" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints foreignKeyName="fk_users_roles"
+                             referencedTableName="roles"
+                             referencedColumnNames="id"/>
+            </column>
+            <column name="avatar" type="text"/>
+        </createTable>
+
+
+        <createTable tableName="news">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author" type="bigint">
+                <constraints foreignKeyName="fk_news_author"
+                             referencedTableName="users"
+                             referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+            <column name="news_date" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="added_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="cover" type="text">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+
+        <createTable tableName="news_paragraphs">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="news_id" type="bigint">
+                <constraints foreignKeyName="fk_news_paragraphs"
+                             referencedTableName="news"
+                             referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+            <column name="position" type="int"/>
+            <column name="paragraph" type="text">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="news_id, position"
+                constraintName="constr_news_paragraph_position"
+                tableName="news_paragraphs"/>
+
+
+        <createTable tableName="news_images">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="news_id" type="bigint">
+                <constraints foreignKeyName="fk_news_images"
+                             referencedTableName="news"
+                             referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+            <column name="position" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image" type="text">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                columnNames="news_id, position"
+                constraintName="constr_news_images_position"
+                tableName="news_images"/>
+
+
+        <createTable tableName="comments">
+            <column name="id" type="bigserial">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="fk_comments_users"
+                             referencedTableName="users"
+                             referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+            <column name="comment" type="varchar(2048)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="added_at" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+
+
+        <createTable tableName="news_likes">
+            <column name="news_id" type="bigint">
+                <constraints foreignKeyName="fk_likes_news"
+                             referencedTableName="news"
+                             referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints foreignKeyName="fk_likes_users"
+                             referencedTableName="users"
+                             referencedColumnNames="id"
+                             nullable="false"/>
+            </column>
+            <column name="like" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+    </changeSet>
+
+</databaseChangeLog>

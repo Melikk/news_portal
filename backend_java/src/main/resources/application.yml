@@ -1,0 +1,19 @@
+server:
+  port: 8001
+  address: 127.0.0.1
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5444/news_db
+    username: postgres
+    password: postgres
+  liquibase:
+    change-log: classpath:db/liquibase-changelog.xml
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+news:
+  upload:
+    fs-root: media
